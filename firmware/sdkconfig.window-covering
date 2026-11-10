@@ -1,0 +1,6 @@
+# Gate endpoint as Window Covering (candidate 2 of the spec). Use after sdkconfig.matter.
+CONFIG_GATE_ENDPOINT_WINDOW_COVERING=y
+CONFIG_SUPPORT_CLOSURE_CONTROL_CLUSTER=n
+CONFIG_SUPPORT_WINDOW_COVERING_CLUSTER=y
+# The Window Covering device type also has a Groups server (esp-matter legacy endpoint::window_covering)
+CONFIG_SUPPORT_GROUPS_CLUSTER=y

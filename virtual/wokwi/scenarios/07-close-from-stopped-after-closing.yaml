@@ -1,0 +1,39 @@
+# CLOSE from stopped midway after closing: the next step of Nice opens, so the device needs three
+# pulses: open (expected), stop, close. The gate ends closed without error.
+name: close from stopped midway after closing
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: setup, wall button opens for a while
+    set-control: { part-id: wall, name: pressed, value: 1 }
+  - delay: 300ms
+  - set-control: { part-id: wall, name: pressed, value: 0 }
+  - wait-serial: 'gate: state=OPENING busy=0 error=NONE'
+  - delay: 3000ms
+  - set-control: { part-id: wall, name: pressed, value: 1 }
+  - delay: 300ms
+  - set-control: { part-id: wall, name: pressed, value: 0 }
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - name: setup, wall button closes for a while and stops
+    set-control: { part-id: wall, name: pressed, value: 1 }
+  - delay: 300ms
+  - set-control: { part-id: wall, name: pressed, value: 0 }
+  - wait-serial: 'gate: state=CLOSING busy=0 error=NONE'
+  - delay: 500ms
+  - set-control: { part-id: wall, name: pressed, value: 1 }
+  - delay: 300ms
+  - set-control: { part-id: wall, name: pressed, value: 0 }
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: CLOSED, value: 0 }
+
+  - name: close
+    write-serial: "close\n"
+  - wait-serial: 'gate: state=OPENING busy=1 error=NONE'
+  - wait-serial: 'gate: state=CLOSING busy=1 error=NONE'
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: CLOSED, value: 1 }

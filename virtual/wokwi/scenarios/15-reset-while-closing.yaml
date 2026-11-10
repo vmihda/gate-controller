@@ -1,0 +1,25 @@
+# Device reset while CLOSE runs: after the reboot the command is gone, no pulse is sent, the gate
+# closes by itself and the device reports it.
+name: reset while closing
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: setup, open fully
+    write-serial: "open\n"
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+
+  - name: close
+    write-serial: "close\n"
+  - wait-serial: 'gate: state=CLOSING busy=1 error=NONE'
+  - name: reset
+    write-serial: "restart\n"
+  - wait-serial: 'rst:'
+  - wait-serial: 'gate: state=CLOSING busy=0 error=NONE'
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: CLOSED, value: 1 }
+  - expect-pin: { part-id: nice, name: LONG_CLOSURE, value: 0 }

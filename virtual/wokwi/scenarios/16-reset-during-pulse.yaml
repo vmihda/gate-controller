@@ -1,0 +1,22 @@
+# Device reset while the OPEN pulse is active: the new boot drives D1 low and hands it to the RMT
+# only after the leftover pulse is over, so Nice sees one step and the gate opens to the limit.
+name: reset during the pulse
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: open, and reset while the relay is on
+    write-serial: "open\n"
+  - expect-chip-output: 'nice: OPENING'
+  - write-serial: "restart\n"
+  - name: the ROM prints the reset line before the new boot releases D1
+    wait-serial: 'rst:'
+  - expect-chip-output: 'nice: contact released after'
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: OPEN, value: 1 }
+  - expect-pin: { part-id: nice, name: LONG_CLOSURE, value: 0 }
+  - expect-pin: { part-id: nice, name: ALWAYS_OPEN, value: 0 }

@@ -1,0 +1,23 @@
+# The gate task hangs while the OPEN pulse is active. The pulse still ends after 500 ms (RMT), the
+# task watchdog resets the device, Nice never sees a 3 s closure ("always open"), and the gate
+# opens to the limit without another pulse.
+name: hang during the pulse
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: open, and hang while the relay is on
+    write-serial: "open\n"
+  - write-serial: "hang\n"
+  - wait-serial: 'hang: relay pulse refused'
+  - expect-chip-output: 'nice: contact released after 500 ms'
+  - wait-serial: 'Task watchdog got triggered'
+  - wait-serial: 'restarted by the task watchdog'
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: OPEN, value: 1 }
+  - expect-pin: { part-id: nice, name: ALWAYS_OPEN, value: 0 }
+  - expect-pin: { part-id: nice, name: LONG_CLOSURE, value: 0 }

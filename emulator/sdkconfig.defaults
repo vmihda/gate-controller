@@ -1,0 +1,9 @@
+CONFIG_IDF_TARGET="esp32"
+# The model task runs every 1 ms (PP edges, FLASH chopping up to about 100 Hz).
+CONFIG_FREERTOS_HZ=1000
+# Console on UART0 (the USB-UART of the board): commands chop, travel, status.
+CONFIG_ESP_CONSOLE_UART_DEFAULT=y
+CONFIG_ESP_CONSOLE_UART_BAUDRATE=115200
+# Keep boot and library logs off the console: the bench reads pp_closure_ms lines.
+CONFIG_BOOTLOADER_LOG_LEVEL_WARN=y
+CONFIG_LOG_DEFAULT_LEVEL_WARN=y

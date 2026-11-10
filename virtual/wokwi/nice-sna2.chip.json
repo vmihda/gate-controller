@@ -1,0 +1,19 @@
+{
+  "name": "Nice SNA2 (model)",
+  "author": "gate-controller",
+  "pins": [
+    "RELAY",
+    "PP",
+    "OBST",
+    "FLASH",
+    "STEP",
+    "DIR",
+    "CLOSED",
+    "OPEN",
+    "ALWAYS_OPEN",
+    "LONG_CLOSURE",
+    "VCC",
+    "GND"
+  ],
+  "controls": []
+}

@@ -1,0 +1,17 @@
+# CLOSE from closed: no pulse, the gate stays closed, the command ends without error.
+name: close from closed
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: close
+    write-serial: "close\n"
+  - name: a pulse would have started the gate by now
+    delay: 3000ms
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: CLOSED, value: 1 }

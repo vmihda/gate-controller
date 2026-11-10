@@ -1,0 +1,27 @@
+# Device reset while the gate opens (started by the wall button). After the reboot an OPEN sent at
+# once, while the state is still unknown, waits for recognition and sends no pulse: the gate opens
+# to the limit by itself.
+name: reset while opening
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: setup, wall button starts opening
+    set-control: { part-id: wall, name: pressed, value: 1 }
+  - delay: 300ms
+  - set-control: { part-id: wall, name: pressed, value: 0 }
+  - wait-serial: 'gate: state=OPENING busy=0 error=NONE'
+
+  - name: reset
+    write-serial: "restart\n"
+  - wait-serial: 'rst:'
+  - wait-serial: 'gate> '
+  - name: open while the state is not recognized yet
+    write-serial: "open\n"
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: OPEN, value: 1 }
+  - expect-pin: { part-id: nice, name: LONG_CLOSURE, value: 0 }

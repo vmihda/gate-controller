@@ -1,0 +1,54 @@
+menu "Gate controller"
+
+    choice GATE_BUILD_MODE
+        prompt "Firmware mode"
+        default GATE_MODE_PRODUCT
+
+        config GATE_MODE_PRODUCT
+            bool "Product firmware: Matter, relay and FLASH input"
+
+        config GATE_SIM
+            bool "Without Matter: commands from the console (Wokwi and bench checks)"
+            help
+                The project CMakeLists.txt links Matter only when SDKCONFIG_DEFAULTS does not include
+                sdkconfig.sim, so select this mode through that file, not in menuconfig.
+
+        config GATE_DEMO
+            bool "Matter with the gate simulated inside the firmware on nice_core"
+
+    endchoice
+
+    choice GATE_ENDPOINT_KIND
+        prompt "Matter device type of the gate endpoint"
+        depends on !GATE_SIM
+        default GATE_ENDPOINT_CLOSURE
+
+        config GATE_ENDPOINT_CLOSURE
+            bool "Closure"
+
+        config GATE_ENDPOINT_WINDOW_COVERING
+            bool "Window Covering"
+
+        config GATE_ENDPOINT_DOOR_LOCK
+            bool "Door Lock"
+
+    endchoice
+
+    config GATE_SETUP_PASSCODE
+        int "Matter setup passcode of this unit"
+        depends on !GATE_SIM
+        range 0 99999998
+        default 0
+        help
+            Set in the settings file of this unit, firmware/units/<unit>.defaults (template:
+            units/unit.defaults.example). 0 means not set, and the build stops.
+
+    config GATE_SETUP_DISCRIMINATOR
+        int "Matter discriminator of this unit"
+        depends on !GATE_SIM
+        range 0 4095
+        default 0
+        help
+            Set in the same settings file as GATE_SETUP_PASSCODE.
+
+endmenu

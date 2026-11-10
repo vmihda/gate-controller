@@ -1,0 +1,26 @@
+# Wall button stops the gate while OPEN runs: stopped midway counts as open, the command ends
+# without error and sends no more pulses.
+name: wall button during open
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: open
+    write-serial: "open\n"
+  - wait-serial: 'gate: state=OPENING busy=1 error=NONE'
+  - delay: 2000ms
+  - name: wall button stops the gate
+    set-control: { part-id: wall, name: pressed, value: 1 }
+  - delay: 300ms
+  - set-control: { part-id: wall, name: pressed, value: 0 }
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - name: a pulse would have moved the gate by now
+    delay: 3000ms
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: OPEN, value: 0 }
+  - expect-pin: { part-id: nice, name: CLOSED, value: 0 }

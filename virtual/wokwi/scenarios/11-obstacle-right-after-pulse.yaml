@@ -1,0 +1,35 @@
+# Obstacle right after the CLOSE pulse, before the device has recognized closing. Nice reverses
+# back to the open limit and stops before the device can recognize the reopening, so on FLASH this
+# is a stop without our pulse: the command ends with UNEXPECTED_STOP and sends no more pulses; the
+# contact count proves it, the reversal included.
+name: obstacle right after the pulse
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: setup, open fully
+    write-serial: "open\n"
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+
+  - name: close
+    write-serial: "close\n"
+  - expect-chip-output: 'nice: CLOSING'
+  - delay: 300ms
+  - name: obstacle
+    set-control: { part-id: obstacle, name: pressed, value: 1 }
+  - delay: 100ms
+  - set-control: { part-id: obstacle, name: pressed, value: 0 }
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=UNEXPECTED_STOP'
+  - name: a pulse would have moved the gate by now
+    delay: 5000ms
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=UNEXPECTED_STOP'
+  - expect-pin: { part-id: nice, name: OPEN, value: 1 }
+  - name: no closure since the obstacle, not even one Nice ignored during the reversal (open + close = 2)
+    set-control: { part-id: obstacle, name: pressed, value: 1 }
+  - expect-chip-output: 'nice: 2 closures so far'
+  - set-control: { part-id: obstacle, name: pressed, value: 0 }

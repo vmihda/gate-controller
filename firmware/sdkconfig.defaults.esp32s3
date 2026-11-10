@@ -1,0 +1,3 @@
+# Bench board: Seeed Studio XIAO ESP32-S3, 8 MB flash.
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions_s3.csv"

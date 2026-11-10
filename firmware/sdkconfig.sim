@@ -1,0 +1,4 @@
+# Build without Matter for Wokwi and the bench checks: commands open, close, status, hang and restart
+# come from the USB console. The project CMakeLists.txt leaves esp-matter out when this file is
+# in SDKCONFIG_DEFAULTS.
+CONFIG_GATE_SIM=y

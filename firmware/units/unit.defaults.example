@@ -1,0 +1,10 @@
+# Settings of one unit: copy to units/<unit>.defaults (for example units/bench-s3.defaults) and put it last
+# in SDKCONFIG_DEFAULTS. The copies are not committed: the code lets anyone in BLE range add the device
+# while it waits to be added. The same code goes on the unit's sticker.
+#
+# Passcode: 1 to 99999998, no leading zeros (a leading 0 makes an octal number), not 11111111, 22222222, ...,
+# 99999999, 12345678 or 87654321.
+# Discriminator: 0 to 4095, different for units that can be added at the same place.
+# One way to pick both: python3 -c "import secrets; print(secrets.randbelow(99999998) + 1, secrets.randbelow(4096))"
+CONFIG_GATE_SETUP_PASSCODE=0
+CONFIG_GATE_SETUP_DISCRIMINATOR=0

@@ -1,0 +1,22 @@
+# OPEN from fully open: no pulse, the gate stays open.
+name: open from open
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: setup, open fully
+    write-serial: "open\n"
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: OPEN, value: 1 }
+
+  - name: open again
+    write-serial: "open\n"
+  - name: a pulse would have started closing by now
+    delay: 3000ms
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: OPEN, value: 1 }

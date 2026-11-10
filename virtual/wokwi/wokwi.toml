@@ -1,0 +1,10 @@
+# Device firmware: the GATE_SIM build for XIAO ESP32-S3 (see README.md for the build command).
+[wokwi]
+version = 1
+firmware = "../../firmware/build-s3/flasher_args.json"
+elf = "../../firmware/build-s3/gate_controller.elf"
+
+# Nice SNA2 model, compiled from nice-sna2.chip.c and nice_sim.c.
+[[chip]]
+name = "nice-sna2"
+binary = "nice-sna2.chip.wasm"

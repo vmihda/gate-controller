@@ -1,0 +1,4 @@
+# Gate endpoint as Door Lock (candidate 3 of the spec). Use after sdkconfig.matter.
+CONFIG_GATE_ENDPOINT_DOOR_LOCK=y
+CONFIG_SUPPORT_CLOSURE_CONTROL_CLUSTER=n
+CONFIG_SUPPORT_DOOR_LOCK_CLUSTER=y

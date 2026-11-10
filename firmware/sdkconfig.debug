@@ -1,0 +1,4 @@
+# Debug build: full logs and error names for diagnosing problems.
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+CONFIG_ESP_ERR_TO_NAME_LOOKUP=y
+CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_ENABLE=y

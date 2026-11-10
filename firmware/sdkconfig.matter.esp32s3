@@ -1,0 +1,2 @@
+# Matter builds on the XIAO ESP32-S3: the second core's IDLE task is not watched either, see sdkconfig.matter.
+CONFIG_ESP_TASK_WDT_CHECK_IDLE_TASK_CPU1=n

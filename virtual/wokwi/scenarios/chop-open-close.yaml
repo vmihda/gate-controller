@@ -1,0 +1,22 @@
+# Chopped FLASH: the "lit" phases come as a chopped signal (run with a diagram whose chip has
+# chop_hz set, see run-scenarios.sh). OPEN and CLOSE must work as with the steady signal.
+name: chopped FLASH, open and close
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: open
+    write-serial: "open\n"
+  - wait-serial: 'gate: state=OPENING busy=1 error=NONE'
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: OPEN, value: 1 }
+
+  - name: close
+    write-serial: "close\n"
+  - wait-serial: 'gate: state=CLOSING busy=1 error=NONE'
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+  - expect-pin: { part-id: nice, name: CLOSED, value: 1 }

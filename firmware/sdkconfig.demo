@@ -1,0 +1,3 @@
+# Apple Home check without the bench: the gate is simulated inside the firmware (main/demo_gate.cpp).
+# Use after sdkconfig.matter: SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.matter;sdkconfig.demo;...".
+CONFIG_GATE_DEMO=y

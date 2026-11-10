@@ -1,0 +1,35 @@
+# Obstacle while CLOSE is running: Nice reverses for 1 s and stops. The command is cancelled with
+# OBSTACLE, no more pulses: the gate stays where the reversal left it, and the contact count proves no
+# pulse came during the reversal either (Nice ignores a step then, so the position cannot show it).
+name: obstacle during closing
+version: 1
+author: gate-controller
+steps:
+  - name: device ready, gate closed
+    wait-serial: 'gate> '
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=CLOSED busy=0 error=NONE'
+
+  - name: setup, open fully
+    write-serial: "open\n"
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=NONE'
+
+  - name: close
+    write-serial: "close\n"
+  - wait-serial: 'gate: state=CLOSING busy=1 error=NONE'
+  - delay: 2000ms
+  - name: obstacle
+    set-control: { part-id: obstacle, name: pressed, value: 1 }
+  - delay: 100ms
+  - set-control: { part-id: obstacle, name: pressed, value: 0 }
+  - wait-serial: 'busy=0 error=OBSTACLE'
+  - name: a pulse would have moved the gate by now
+    delay: 5000ms
+  - write-serial: "status\n"
+  - wait-serial: 'gate: state=NOT_CLOSED busy=0 error=OBSTACLE'
+  - expect-pin: { part-id: nice, name: OPEN, value: 0 }
+  - expect-pin: { part-id: nice, name: CLOSED, value: 0 }
+  - name: no closure since the obstacle, not even one Nice ignored during the reversal (open + close = 2)
+    set-control: { part-id: obstacle, name: pressed, value: 1 }
+  - expect-chip-output: 'nice: 2 closures so far'
+  - set-control: { part-id: obstacle, name: pressed, value: 0 }

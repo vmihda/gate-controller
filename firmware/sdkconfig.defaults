@@ -1,0 +1,44 @@
+# Common settings for XIAO ESP32-S3 (bench) and XIAO ESP32-C6 (gate). Target-specific values are in
+# sdkconfig.defaults.esp32s3 and sdkconfig.defaults.esp32c6, which ESP-IDF loads after this file.
+
+# Partition table; the CSV and flash size are per target
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_OFFSET=0xC000
+
+# Log and console over USB on both boards
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+
+# Release logging; sdkconfig.debug restores the full log
+CONFIG_LOG_DEFAULT_LEVEL_WARN=y
+CONFIG_LOG_MAXIMUM_EQUALS_DEFAULT=y
+CONFIG_COMPILER_OPTIMIZATION_SIZE=y
+CONFIG_COMPILER_OPTIMIZATION_ASSERTIONS_SILENT=y
+CONFIG_ESP_ERR_TO_NAME_LOOKUP=n
+
+# --- Relay safety: a hang must reset the chip, and the reset releases D1 (10 kOhm to ground). ---
+# The pulse itself is timed by the RMT hardware (main/relay_out.cpp), so it ends after 500 ms even if
+# the CPU stops. The watchdogs bound everything else to a reset within 1.5 s of a pulse start.
+
+# Task watchdog: the gate task is subscribed and feeds it every 10 ms. Timeout 1 s, then panic and
+# reboot instead of the ESP-IDF default of only logging. If its interrupt cannot run, the same timer
+# resets the system by hardware at 2 s.
+CONFIG_ESP_TASK_WDT_EN=y
+CONFIG_ESP_TASK_WDT_INIT=y
+CONFIG_ESP_TASK_WDT_PANIC=y
+CONFIG_ESP_TASK_WDT_TIMEOUT_S=1
+
+# Interrupt watchdog: interrupts disabled or an ISR stuck for 300 ms panics, and resets by hardware
+# if the panic handler cannot run.
+CONFIG_ESP_INT_WDT=y
+CONFIG_ESP_INT_WDT_TIMEOUT_MS=300
+
+# RTC watchdog: ESP-IDF stops the bootloader's RTC watchdog before app_main (the default kept here);
+# relay_out arms it again with a 1.2 s chip reset when the gate task starts, and the gate task feeds it
+# every 10 ms. It covers a hang where neither timer-group watchdog gets to reset the chip.
+
+# Bounded panic path: print a short report and reboot at once. No core dump (writing one to flash
+# takes seconds), no GDB stub (it would wait for a debugger), no reboot delay. The panic handler
+# re-arms the RTC watchdog for 10 s as its own backstop.
+CONFIG_ESP_SYSTEM_PANIC_PRINT_REBOOT=y
+CONFIG_ESP_SYSTEM_PANIC_REBOOT_DELAY_SECONDS=0
+CONFIG_ESP_COREDUMP_ENABLE_TO_NONE=y
