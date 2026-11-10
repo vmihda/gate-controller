@@ -1,6 +1,6 @@
 # Nice SPIN garage gate controller over Matter
 
-A Matter (Wi-Fi) controller for a Nice SPIN garage gate with the Nice SNA2 control board, for Apple Home. It opens and closes the gate through a relay on the board's Step-by-step input and reads the gate state from the FLASH output (set to "gate open indicator" mode). A command that the gate does not confirm is reported as an error.
+A Matter over Wi-Fi controller that adds a Nice SPIN garage gate (Nice SNA2 control board) to Apple Home. A relay on the board's Step-by-step input opens and closes the gate. The FLASH output, set to "gate open indicator" mode, gives the gate state. If the gate does not respond to a command, the device reports an error.
 
 - Bench device: Seeed Studio XIAO ESP32-S3.
 - Gate device: Seeed Studio XIAO ESP32-C6.
@@ -40,7 +40,7 @@ cmake -S firmware/test_host -B build-host && cmake --build build-host && ctest -
 
 Run in `firmware`.
 
-Every unit has its own code for adding it to Home. Copy `firmware/units/unit.defaults.example` to `firmware/units/<unit>.defaults` and fill in the passcode and the discriminator as the file says. These files are not committed. At startup the board prints the code to the console in the `Matter setup code`, `Manual pairing code` and `QR code` lines.
+Each board has its own Home pairing code. Copy `firmware/units/unit.defaults.example` to `firmware/units/<unit>.defaults` and fill in the passcode and the discriminator as the file explains. Git ignores these copies. At startup the board prints the code to the console in the `Matter setup code`, `Manual pairing code` and `QR code` lines.
 
 XIAO ESP32-C6 at the gate:
 
@@ -52,13 +52,13 @@ idf.py -B build-c6-matter -D SDKCONFIG=build-c6-matter/sdkconfig -p PORT build e
 
 XIAO ESP32-S3 on the bench: the same commands with `units/bench-s3.defaults`, the `build-s3-matter` directory and `set-target esp32s3`.
 
-- Every set of settings needs its own build directory. A directory remembers at first configuration whether the build has Matter, and a build without Matter no longer builds in it. This check does not tell the working build from the demo build, so the demo always gets its own directory.
-- `set-target` is needed only for a new directory: it recreates the build settings.
-- `erase-flash` is needed when a board is flashed for the first time. It erases the whole flash, including an earlier pairing with Home. Flash without it after that.
+- Use a separate build directory for each set of settings. On first configuration a directory records whether the build includes Matter, and a build without Matter will not build there afterwards. That record does not tell the working build from the demo build, so always give the demo its own directory.
+- Run `set-target` only for a new directory, because it recreates the build settings.
+- Use `erase-flash` only the first time you flash a board. It wipes the whole flash, Home pairing included.
 - The gate shows up in Home as a Closure by default. Alternatives: add `sdkconfig.window-covering` or `sdkconfig.door-lock` after `sdkconfig.matter`.
 - `sdkconfig.debug` adds full logs and error names.
 
-**Never put `sdkconfig.demo` on the board at the gate.** The demo build has no relay: the Nice board is simulated inside the firmware, and it does not control a real gate. It is for checking how Home shows the gate without the bench. `sdkconfig.sim` is for Wokwi only.
+**Never put `sdkconfig.demo` on the board at the gate.** The demo build has no relay and cannot control a real gate. It simulates the Nice board inside the firmware, so you can see how Home shows the gate without the bench. `sdkconfig.sim` is for Wokwi only.
 
 ## Emulator
 
